@@ -18,6 +18,7 @@ int main(int argc, char const *argv[]) {
 	MatrizEsparsa me1, me2;
 	int l1=0, c1=0, l2=0, c2=0, l=0, c=0, valor=0;
 	do{
+	//	printf("struct %i         variavel %i",me1.num_linhas,l1);
 		printf("\n\n	Escolha a op??o desejada:\n	1. Inicializar uma matriz.\n	2. Carregar matriz do arquivo. \n	3. Visualizar uma matriz\n	4. Modificar uma matriz, dadas as coordenadas (linha e coluna)\n	5. Salvar uma matriz\n	6. Soma entre matrizes\n	7. Subtra??o entre matrizes\n	8. Multiplica??o entre matrizes\n	9. Salvar matriz.\n	10. Sair do programa\n\n	");
 		scanf("%i",&opcao);
 		switch(opcao){
@@ -49,9 +50,13 @@ int main(int argc, char const *argv[]) {
 				switch(escolha_me){
 					case 1:
 						matriz_arquivo(&me1,escolha_me);
+						l1=me1.num_linhas;
+						c1=me1.num_colunas;
 						break;
 					case 2:
 						matriz_arquivo(&me2,escolha_me);
+						l2=me2.num_linhas;
+						c2=me2.num_colunas;
 						break;
 				}
 				break;
@@ -130,16 +135,25 @@ int main(int argc, char const *argv[]) {
 void modifica_matriz(MatrizEsparsa *me, int l, int c, int valor,int escolha_me){
 	//system("cls"); //Limpa a tela.
 	if(checa_me_inicializou(*me)){
+		if((valor==0)&&(((me->num_linhas)<l)||((me->num_colunas)<c))){
+			printf("\n	 nao pode inserir 0.");
+		}
 		int tam_entrada = sizeof(me->m[l])/sizeof(EntradaMatriz);
 		if(tam_entrada==0){
 			me->m[l] = malloc(sizeof(EntradaMatriz));
 		}
 		tam_entrada++;
-		me->m[l] = realloc(me->m[l], sizeof(EntradaMatriz)*tam_entrada);
-		me->m[l]->coluna = c;
-		me->m[l]->valor = valor;
+		if((me->num_linhas)<l){
+			realloc(me->m,sizeof(EntradaMatriz*)*l);
+		}
+		if((me->num_colunas)<c){
+			realloc(me->m[l],sizeof(EntradaMatriz)*tam_entrada);
+		}
+		me->m[l][tam_entrada].valor=valor;
+		me->m[l][tam_entrada].coluna=c;
 		mostra_m(*me,escolha_me);
-	}else{
+	}
+	else{
 		printf("\n	Matriz n?o inicializada.");
 	}
 }
@@ -160,7 +174,7 @@ void mostra_m(MatrizEsparsa *me,int escolha_me){
   		for(i=0;i<(me->num_linhas);i++){
 	    	if((me->m[i])==NULL){
 		    	for(j=0;j<(me->num_colunas);j++){
-		    	//	printf("	0");
+		    		printf("	0");
 				}
     		}else{
     			int k = 0;
@@ -169,7 +183,7 @@ void mostra_m(MatrizEsparsa *me,int escolha_me){
 		    			printf("	%.2f",me->m[i][k].valor);
 		    			k++;
 					}else{
-				//		printf("	0");
+						printf("	0");
 					}
 				}
 			}
