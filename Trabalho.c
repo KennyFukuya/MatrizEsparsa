@@ -135,27 +135,44 @@ int main(int argc, char const *argv[]) {
 void modifica_matriz(MatrizEsparsa *me, int l, int c, int valor,int escolha_me){
 	//system("cls"); //Limpa a tela.
 	if(checa_me_inicializou(*me)){
-		if((valor==0)&&(((me->num_linhas)<l)||((me->num_colunas)<c))){
-			printf("\n	 nao pode inserir 0.");
+		if(valor==0){
+			if(((me->num_linhas)<l)||((me->num_colunas)<c)){
+				printf("\n	 Formato errado!.");
+			}else{
+				int tam_entrada = sizeof(me->m[l])/sizeof(EntradaMatriz);
+				if(tam_entrada==0){
+					me->m[l] = malloc(sizeof(EntradaMatriz));
+				}
+				tam_entrada++;
+				if((me->num_linhas)<l){
+					realloc(me->m,sizeof(EntradaMatriz*)*l);
+				}
+				if((me->num_colunas)<c){
+					realloc(me->m[l],sizeof(EntradaMatriz)*tam_entrada);
+				}
+				me->m[l][tam_entrada].valor=valor;
+				me->m[l][tam_entrada].coluna=c;
+				mostra_m(*me,escolha_me);
+			}
+		}else{
+			int tam_entrada = sizeof(me->m[l])/sizeof(EntradaMatriz);
+			if(tam_entrada==0){
+				me->m[l] = malloc(sizeof(EntradaMatriz));
+			}
+			tam_entrada++;
+			if((me->num_linhas)<l){
+				realloc(me->m,sizeof(EntradaMatriz*)*l);
+			}
+			if((me->num_colunas)<c){
+				realloc(me->m[l],sizeof(EntradaMatriz)*tam_entrada);
+			}
+			me->m[l][tam_entrada].valor=valor;
+			me->m[l][tam_entrada].coluna=c;
+			mostra_m(*me,escolha_me);
 		}
-		int tam_entrada = sizeof(me->m[l])/sizeof(EntradaMatriz);
-		if(tam_entrada==0){
-			me->m[l] = malloc(sizeof(EntradaMatriz));
+	}else{
+			printf("\n	Matriz n?o inicializada.");
 		}
-		tam_entrada++;
-		if((me->num_linhas)<l){
-			realloc(me->m,sizeof(EntradaMatriz*)*l);
-		}
-		if((me->num_colunas)<c){
-			realloc(me->m[l],sizeof(EntradaMatriz)*tam_entrada);
-		}
-		me->m[l][tam_entrada].valor=valor;
-		me->m[l][tam_entrada].coluna=c;
-		mostra_m(*me,escolha_me);
-	}
-	else{
-		printf("\n	Matriz n?o inicializada.");
-	}
 }
 
 void inicializa_matrizesp(MatrizEsparsa *me, int l, int c){
