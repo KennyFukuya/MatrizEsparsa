@@ -10,7 +10,6 @@ typedef struct{
 typedef struct{
   EntradaMatriz **m;
   int num_linhas, num_colunas;
-  char nome[50];
 }MatrizEsparsa;
 
 int main(int argc, char const *argv[]) {
@@ -282,7 +281,7 @@ void salva_matriz(MatrizEsparsa *me, int escolha_me){
 			fclose(arq);
 			break;
 		case 2:
-			arq=fopen("matriz1.txt","w");
+			arq=fopen("matriz2.txt","w");
 			fprintf(arq,"%i %i\n",me->num_linhas,me->num_colunas);
 			for(i=0;i<me->num_linhas;i++){
 				for(j=0;j<me->num_colunas;j++){
