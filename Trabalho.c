@@ -134,42 +134,32 @@ int main(int argc, char const *argv[]) {
 
 void modifica_matriz(MatrizEsparsa *me, int l, int c, int valor,int escolha_me){
 	//system("cls"); //Limpa a tela.
+	int i=0;
 	if(checa_me_inicializou(*me)){
-		if(valor==0){
-			if(((me->num_linhas)<l)||((me->num_colunas)<c)){
-				printf("\n	 Formato errado!.");
-			}else{
-				int tam_entrada = sizeof(me->m[l])/sizeof(EntradaMatriz);
-				if(tam_entrada==0){
-					me->m[l] = malloc(sizeof(EntradaMatriz));
-				}
-				tam_entrada++;
-				if((me->num_linhas)<l){
-					realloc(me->m,sizeof(EntradaMatriz*)*l);
-				}
-				if((me->num_colunas)<c){
-					realloc(me->m[l],sizeof(EntradaMatriz)*tam_entrada);
-				}
-				me->m[l][tam_entrada].valor=valor;
-				me->m[l][tam_entrada].coluna=c;
-				mostra_m(*me,escolha_me);
-			}
-		}else{
-			int tam_entrada = sizeof(me->m[l])/sizeof(EntradaMatriz);
-			if(tam_entrada==0){
-				me->m[l] = malloc(sizeof(EntradaMatriz));
-			}
-			tam_entrada++;
-			if((me->num_linhas)<l){
-				realloc(me->m,sizeof(EntradaMatriz*)*l);
-			}
-			if((me->num_colunas)<c){
-				realloc(me->m[l],sizeof(EntradaMatriz)*tam_entrada);
-			}
-			me->m[l][tam_entrada].valor=valor;
-			me->m[l][tam_entrada].coluna=c;
-			mostra_m(*me,escolha_me);
+		int tam_entrada = sizeof(me->m[l])/sizeof(EntradaMatriz);
+		if(tam_entrada==0){
+			me->m[l] = malloc(sizeof(EntradaMatriz));
 		}
+		tam_entrada++;
+		if((me->num_linhas)<l){
+			me->m = (MatrizEsparsa **) realloc (me->m,sizeof(EntradaMatriz*)*l);
+			me->num_linhas=l;
+			if((me->num_colunas)<c){
+				for(i=0;i<l;i++){
+					me->m[i] = (MatrizEsparsa *) realloc(me->m[i],sizeof(EntradaMatriz)*tam_entrada);
+				}
+				me->num_colunas=c;
+			}
+		}else if((me->num_colunas)<c){
+			for(i=0;i<l;i++){
+			me->m[i] = (MatrizEsparsa *) realloc(me->m[i],sizeof(EntradaMatriz)*tam_entrada);
+			}
+			me->num_colunas=c;
+		}
+		me->m[l][tam_entrada].valor=valor;
+		me->m[l][tam_entrada].coluna=c;
+		mostra_m(*me,escolha_me);	
+		printf("l %i c %i num_linhas %i num_colunas %i",l,c,me->num_linhas,me->num_colunas);
 	}else{
 			printf("\n	Matriz n?o inicializada.");
 		}
