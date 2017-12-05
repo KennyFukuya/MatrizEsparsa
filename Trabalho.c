@@ -92,7 +92,7 @@ int main(int argc, char const *argv[]) {
 						scanf("%i",&c);
 						printf("\n	Informe o valor: ");
 						scanf("%i",&valor);
-						modifica_matriz(&me2, l, c, valor);
+						modifica_matriz(&me2, l, c, valor,escolha_me);
 						break;
 				}
 				break;
@@ -133,36 +133,50 @@ int main(int argc, char const *argv[]) {
 }
 
 void modifica_matriz(MatrizEsparsa *me, int l, int c, int valor,int escolha_me){
+	
 	//system("cls"); //Limpa a tela.
+	
 	int i=0;
 	if(checa_me_inicializou(*me)){
-		int tam_entrada = sizeof(me->m[l])/sizeof(EntradaMatriz);
-		if(tam_entrada==0){
-			me->m[l] = malloc(sizeof(EntradaMatriz));
-		}
-		tam_entrada++;
+		int tam_entrada;
 		if((me->num_linhas)<l){
-			me->m = (MatrizEsparsa **) realloc (me->m,sizeof(EntradaMatriz*)*l);
+			me->m = realloc (me->m,sizeof(EntradaMatriz*)*(l+1));
+			for(i=me->num_linhas;i<l;i++){
+				me->m[i]=NULL;
+			}
 			me->num_linhas=l;
-			if((me->num_colunas)<c){
-				for(i=0;i<l;i++){
-					me->m[i] = (MatrizEsparsa *) realloc(me->m[i],sizeof(EntradaMatriz)*tam_entrada);
-				}
-				me->num_colunas=c;
-			}
-		}else if((me->num_colunas)<c){
-			for(i=0;i<l;i++){
-			me->m[i] = (MatrizEsparsa *) realloc(me->m[i],sizeof(EntradaMatriz)*tam_entrada);
-			}
+		}
+		
+		if(me->m[l] == NULL){
+			tam_entrada=2;
+			me->m[l] = malloc(sizeof(EntradaMatriz)*(tam_entrada));
+			me->m[l][tam_entrada-1].valor=valor;
+			me->m[l][tam_entrada-1].coluna=c;
+		}else{
+			tam_entrada = (sizeof(me->m[l]))/sizeof(EntradaMatriz);
+
+			printf("\n-----------------------  %d  -----------------------\n", tam_entrada);
+
+			me->m[l] = realloc(me->m[l],sizeof(EntradaMatriz)*(tam_entrada));
+			
+			me->m[l][tam_entrada-2].valor=valor;
+			me->m[l][tam_entrada-2].coluna=c;
+		}
+		
+		
+		me->m[l][tam_entrada-1].coluna = -1;
+		
+		if((me->num_colunas)<c){
+			
+			me->m[i] = realloc(me->m[i],sizeof(EntradaMatriz)*(tam_entrada+1));
 			me->num_colunas=c;
-		}
-		me->m[l][tam_entrada].valor=valor;
-		me->m[l][tam_entrada].coluna=c;
-		mostra_m(*me,escolha_me);	
-		printf("l %i c %i num_linhas %i num_colunas %i",l,c,me->num_linhas,me->num_colunas);
+		}				
+		
+		mostra_m(*me,escolha_me);
+				
 	}else{
-			printf("\n	Matriz n?o inicializada.");
-		}
+		printf("\n	Matriz n?o inicializada.");
+	}
 }
 
 void inicializa_matrizesp(MatrizEsparsa *me, int l, int c){
@@ -175,6 +189,16 @@ void inicializa_matrizesp(MatrizEsparsa *me, int l, int c){
 
 void mostra_m(MatrizEsparsa *me,int escolha_me){
 	//system("cls"); //Limpa a tela.
+	int cont1, cont2;
+	for(cont1=0; cont1<2; cont1++ ){
+		for(cont2=0; cont2<3; cont2++ ){
+			printf("%d", me->m[cont1][cont2].coluna);
+		}
+	}
+	
+	
+	
+	
 	if(checa_me_inicializou(*me)){
 		int i,j;
 		printf("\n\n	Matriz %i:\n",escolha_me); //Coloquei pra mostrar qual matriz foi modificada (Kenny). tem um erro que quero arrumar na modifica matriz o ESCOLHA_ME não ta funcionando!!!!!
@@ -235,19 +259,19 @@ void matriz_arquivo(MatrizEsparsa *me, int escolha_me){
 				fscanf(arq,"%i %i ",&me->num_linhas,&me->num_colunas);
 				me->m=malloc(sizeof(EntradaMatriz*)*me->num_linhas);
 				for(i=0;i<me->num_linhas;i++){
-					int ind=1;
-		            me->m[i]=malloc(sizeof(EntradaMatriz)*ind);
+					int ind=0;
+		            me->m[i]=malloc(sizeof(EntradaMatriz));
 					for(j=0;j<me->num_colunas;j++){
 						fscanf(arq,"%f",&checar);
 						if(checar != 0){
 		                    ind++;
 		                    me->m[i]=realloc(me->m[i],sizeof(EntradaMatriz)*ind);
-							me->m[i][ind-2].valor=checar;
-							me->m[i][ind-2].coluna=j;
+							me->m[i][ind-1].valor=checar;
+							me->m[i][ind-1].coluna=j;
 						}
-					  }
-					me->m[i][ind-1].coluna = -1;
 					}
+					me->m[i][ind].coluna = -1;
+				}
 			fclose(arq);
 			printf("\n\n	Matriz %i carregada com sucesso!\n",escolha_me);
 		}
@@ -260,18 +284,18 @@ void matriz_arquivo(MatrizEsparsa *me, int escolha_me){
 				fscanf(arq,"%i %i ",&me->num_linhas,&me->num_colunas);
 				me->m=malloc(sizeof(EntradaMatriz*)*me->num_linhas);
 				for(i=0;i<me->num_linhas;i++){
-					int ind=1;
-		            me->m[i]=malloc(sizeof(EntradaMatriz)*ind);
+					int ind=0;
+		            me->m[i]=malloc(sizeof(EntradaMatriz));
 					for(j=0;j<me->num_colunas;j++){
 						fscanf(arq,"%f",&checar);
 						if(checar != 0){
 		                    ind++;
 		                    me->m[i]=realloc(me->m[i],sizeof(EntradaMatriz)*ind);
-							me->m[i][ind-2].valor=checar;
-							me->m[i][ind-2].coluna=j;
+							me->m[i][ind-1].valor=checar;
+							me->m[i][ind-1].coluna=j;
 						}
 					  }
-					me->m[i][ind-1].coluna = -1;
+					me->m[i][ind].coluna = -1;
 				}
 			fclose(arq);
 			printf("\n\n	Matriz %i carregada com sucesso!\n",escolha_me);
