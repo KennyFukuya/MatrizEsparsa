@@ -144,39 +144,44 @@ void modifica_matriz(MatrizEsparsa *me, int l, int c, int valor,int escolha_me){
 			for(i=me->num_linhas;i<l;i++){
 				me->m[i]=NULL;
 			}
-			me->num_linhas=l;
+			me->num_linhas=l+1;
 		}
 		
 		if(me->m[l] == NULL){
-			tam_entrada=2;
+			tam_entrada = 2;
 			me->m[l] = malloc(sizeof(EntradaMatriz)*(tam_entrada));
-			me->m[l][tam_entrada-1].valor=valor;
-			me->m[l][tam_entrada-1].coluna=c;
-		}else{
-			tam_entrada = (sizeof(me->m[l]))/sizeof(EntradaMatriz);
-
-			printf("\n-----------------------  %d  -----------------------\n", tam_entrada);
-
-			me->m[l] = realloc(me->m[l],sizeof(EntradaMatriz)*(tam_entrada));
-			
 			me->m[l][tam_entrada-2].valor=valor;
 			me->m[l][tam_entrada-2].coluna=c;
-		}
-		
-		
-		me->m[l][tam_entrada-1].coluna = -1;
-		
-		if((me->num_colunas)<c){
-			
-			me->m[i] = realloc(me->m[i],sizeof(EntradaMatriz)*(tam_entrada+1));
-			me->num_colunas=c;
-		}				
+			me->m[l][tam_entrada-1].coluna = -1;
+		}else{
+			tam_entrada = conta_entrada(me->m[l]);
+			if((me->num_colunas)<c){
+				tam_entrada++;
+				me->m[l] = realloc(me->m[l],sizeof(EntradaMatriz)*(tam_entrada));
+				me->m[l][tam_entrada-1].coluna = -1;
+				me->m[l][tam_entrada-2].coluna = c;
+				me->m[l][tam_entrada-2].valor = valor;
+				me->num_colunas = c+1;
+			}else{
+				me->m[l][c].valor = valor;
+			}
+		}			
 		
 		mostra_m(*me,escolha_me);
+		printf("l %i c %i num_linhas %i num_colunas %i",l,c,me->num_linhas,me->num_colunas);
 				
 	}else{
 		printf("\n	Matriz n?o inicializada.");
 	}
+}
+
+int conta_entrada(EntradaMatriz *m){
+	int i = 0, cont = 1;
+	while(m[i].coluna != -1){
+		cont++;
+		i++;
+	}
+	return cont;
 }
 
 void inicializa_matrizesp(MatrizEsparsa *me, int l, int c){
@@ -189,19 +194,10 @@ void inicializa_matrizesp(MatrizEsparsa *me, int l, int c){
 
 void mostra_m(MatrizEsparsa *me,int escolha_me){
 	//system("cls"); //Limpa a tela.
-	int cont1, cont2;
-	for(cont1=0; cont1<2; cont1++ ){
-		for(cont2=0; cont2<3; cont2++ ){
-			printf("%d", me->m[cont1][cont2].coluna);
-		}
-	}
-	
-	
-	
 	
 	if(checa_me_inicializou(*me)){
 		int i,j;
-		printf("\n\n	Matriz %i:\n",escolha_me); //Coloquei pra mostrar qual matriz foi modificada (Kenny). tem um erro que quero arrumar na modifica matriz o ESCOLHA_ME não ta funcionando!!!!!
+		printf("\n\n	Matriz %i:\n",escolha_me); //Coloquei pra mostrar qual matriz foi modificada (Kenny). tem um erro que quero arrumar na modifica matriz o ESCOLHA_ME n?o ta funcionando!!!!!
   		for(i=0;i<(me->num_linhas);i++){
 	    	if((me->m[i])==NULL){
 		    	for(j=0;j<(me->num_colunas);j++){
