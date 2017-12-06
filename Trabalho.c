@@ -15,11 +15,11 @@ typedef struct{
 int main(int argc, char const *argv[]) {
 	setlocale(LC_ALL, "Portuguese"); /*inser??o de acentos, e outros caracteres.*/
 	int opcao, sair = 0, escolha_me, i;
-	MatrizEsparsa me1, me2;
+	MatrizEsparsa me1, me2, me3;
 	int l1=0, c1=0, l2=0, c2=0, l=0, c=0, valor=0;
 	do{
 	//	printf("struct %i         variavel %i",me1.num_linhas,l1);
-		printf("\n\n	Escolha a op??o desejada:\n	1. Inicializar uma matriz.\n	2. Carregar matriz do arquivo. \n	3. Visualizar uma matriz\n	4. Modificar uma matriz, dadas as coordenadas (linha e coluna)\n	5. Salvar uma matriz\n	6. Soma entre matrizes\n	7. Subtra??o entre matrizes\n	8. Multiplica??o entre matrizes\n	9. Salvar matriz.\n	10. Sair do programa\n\n	");
+		printf("\n\n	Escolha a op??o desejada:\n	1. Inicializar uma matriz.\n	2. Carregar matriz do arquivo. \n	3. Visualizar uma matriz\n	4. Modificar uma matriz, dadas as coordenadas (linha e coluna)\n	5. Soma entre matrizes\n	6. Subtra??o entre matrizes\n	7. Multiplica??o entre matrizes\n	8. Salvar matriz.\n	9. Sair do programa\n\n	");
 		scanf("%i",&opcao);
 		switch(opcao){
 			case 1:
@@ -96,7 +96,13 @@ int main(int argc, char const *argv[]) {
 						break;
 				}
 				break;
-			case 9:
+			case 5:
+				me3.m=malloc(sizeof(EntradaMatriz*));
+				soma_matriz(&me1,&me2,&me3);
+				escolha_me=3;
+				mostra_m(&me3,escolha_me);
+				break;
+			case 8:
 				printf("\n	Escolha a matriz a ser salva: 1 ou 2? ");
 				scanf("%i",&escolha_me);
 				switch(escolha_me){
@@ -108,7 +114,7 @@ int main(int argc, char const *argv[]) {
 						break;
 					}
 				break;	
-			case 10:
+			case 9:
 				if(checa_me_inicializou(&me1)){
 					
 					for(i=0;i<me1.num_colunas;i++){
@@ -340,3 +346,46 @@ void salva_matriz(MatrizEsparsa *me, int escolha_me){
 			break;
 }
 }
+
+
+void soma_matriz(MatrizEsparsa *me1,MatrizEsparsa *me2,MatrizEsparsa *me3){
+	int i,j,k,cont=0;
+	float x=0;
+	if((me1->num_linhas==me2->num_linhas) && (me1->num_colunas==me2->num_colunas)){
+		me3->num_linhas=me1->num_linhas;
+		me3->num_colunas=me1->num_colunas;
+		me3->m=malloc(sizeof(EntradaMatriz*)*me3->num_linhas);
+		for(i=0;i<me3->num_linhas;i++){
+			me3->m[i]=NULL;
+			
+			for(j=0;j<me3->num_colunas;j++){	
+			
+				for(k=0;me1->m[i][j].coluna!=-1;j++){
+					
+					if(me1->m[i][k].coluna==k){
+						x=me1->m[i][j].valor;
+					}
+						
+					if(me2->m[i][k].coluna==k){
+						x=x+me2->m[i][j].valor;
+					}	
+					
+					if(x!=0){
+						me3->m[i]=realloc(me3->m[i],sizeof(EntradaMatriz)*(j+1));
+						me3->m[i][j].coluna=j;
+						me3->m[i][j].valor=x;
+					}
+				x=0;	
+				}
+			me3->m[i][j+1].coluna=-1;
+			}
+		}
+	}else{
+		printf("\n	As matrizes não possuem o mesmo tamanho!\n");
+	}
+}
+	
+
+	
+	
+	
